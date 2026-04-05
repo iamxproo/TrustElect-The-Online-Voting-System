@@ -67,7 +67,7 @@ function Firework({ x, y, onComplete }) {
 }
 
 export default function VotePage() {
-  const { user, getCandidates, castVote } = useAuth();
+  const { user, getCandidates, castVote, logout } = useAuth();
   const navigate = useNavigate();
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -78,24 +78,23 @@ export default function VotePage() {
   const [showConfetti, setShowConfetti] = useState(false);
   const [fireworks, setFireworks] = useState([]);
   const [animationStep, setAnimationStep] = useState(0);
+  const [countdown, setCountdown] = useState(4);
 
   useEffect(() => {
     if (!user || user.type !== 'voter') {
-      navigate('/login');
+      navigate('/');
       return;
     }
 
-    // Check if already voted
-    const voters = JSON.parse(localStorage.getItem('trustelect_voters') || '[]');
-    const voter = voters.find(v => v.id === user.id);
-    if (voter?.hasVoted) {
-      const candidate = getCandidates().find(c => c.id === voter.votedFor);
-      setVotedFor(candidate);
-      setSuccess(true);
-    }
-
-    const data = getCandidates();
-    setCandidates(data);
+    const loadCandidates = async () => {
+      const data = await getCandidates();
+      setCandidates(data);
+      // If user already voted, show success screen
+      if (user.hasVoted) {
+        setSuccess(true);
+      }
+    };
+    loadCandidates();
   }, [user]);
 
   // Handle animation steps
@@ -126,7 +125,22 @@ export default function VotePage() {
         setShowConfetti(false);
       }, 4000);
 
-      return () => clearInterval(fireworkInterval);
+      // Auto logout and go home after 4 seconds
+      const redirectTimer = setTimeout(() => {
+        logout();
+        navigate('/');
+      }, 4000);
+
+      // Countdown ticker
+      const countInterval = setInterval(() => {
+        setCountdown(prev => (prev > 1 ? prev - 1 : 1));
+      }, 1000);
+
+      return () => {
+        clearInterval(fireworkInterval);
+        clearTimeout(redirectTimer);
+        clearInterval(countInterval);
+      };
     }
   }, [success]);
 
@@ -143,7 +157,7 @@ export default function VotePage() {
     if (!selectedCandidate) return;
     
     setLoading(true);
-    const result = castVote(selectedCandidate.id);
+    const result = await castVote(selectedCandidate.id);
     
     if (result.success) {
       setSuccess(true);
@@ -233,7 +247,9 @@ export default function VotePage() {
               <p className="voted-label">You voted for:</p>
               <div className="voted-candidate">
                 <div className="candidate-image-animated">
-                  <img src={votedFor.image} alt={votedFor.name} />
+                  <div className="voted-avatar">
+                    {votedFor.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                  </div>
                   <div className="candidate-image-ring"></div>
                 </div>
                 <div className="voted-info">
@@ -265,6 +281,11 @@ export default function VotePage() {
             <p className="reminder">
               🔒 Remember: Your vote is secret. Do not share your voting details.
             </p>
+
+            <div className="redirect-notice">
+              <div className="redirect-spinner"></div>
+              Redirecting to home in <strong>{countdown}s</strong>...
+            </div>
           </div>
         </main>
 
@@ -556,6 +577,27 @@ export default function VotePage() {
             font-size: 0.9rem;
             margin: 0;
           }
+          .redirect-notice {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1.25rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(30, 58, 138, 0.08);
+            border-radius: 50px;
+            color: #1e40af;
+            font-size: 0.9rem;
+          }
+          .redirect-spinner {
+            width: 14px;
+            height: 14px;
+            border: 2px solid #bfdbfe;
+            border-top-color: #1e40af;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+          }
+          @keyframes spin { to { transform: rotate(360deg); } }
         `}</style>
       </div>
     );
@@ -628,17 +670,8 @@ export default function VotePage() {
                 onClick={() => handleSelect(candidate)}
               >
                 <div className="candidate-vote-number">{index + 1}</div>
-                <div className="candidate-vote-image">
-                  <img 
-                    src={candidate.image} 
-                    alt={candidate.name}
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/300x300?text=Candidate';
-                    }}
-                  />
-                  {candidate.symbol && (
-                    <span className="candidate-vote-symbol">{candidate.symbol}</span>
-                  )}
+                <div className="candidate-vote-avatar">
+                  {candidate.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
                 </div>
                 <div className="candidate-vote-info">
                   <h3>{candidate.name}</h3>
@@ -683,7 +716,9 @@ export default function VotePage() {
             <p>Are you sure you want to vote for:</p>
             
             <div className="confirm-candidate">
-              <img src={selectedCandidate?.image} alt={selectedCandidate?.name} />
+              <div className="confirm-candidate-avatar">
+                {selectedCandidate?.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+              </div>
               <div>
                 <h4>{selectedCandidate?.name}</h4>
                 <p>{selectedCandidate?.party}</p>
@@ -947,19 +982,54 @@ export default function VotePage() {
           font-size: 1.25rem;
         }
 
-        .candidate-vote-image {
-          position: relative;
-          width: 180px;
-          height: 180px;
-          margin: 0 auto 1.5rem;
+        .candidate-vote-avatar {
+          width: 90px;
+          height: 90px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+          color: white;
+          font-size: 2rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1.2rem;
+          border: 4px solid #e2e8f0;
+          box-shadow: 0 4px 15px rgba(30,58,138,0.2);
+          letter-spacing: 0.05em;
         }
 
-        .candidate-vote-image img {
+        .candidate-vote-card.selected .candidate-vote-avatar {
+          border-color: #1e3a8a;
+          box-shadow: 0 4px 20px rgba(30,58,138,0.4);
+        }
+
+        .confirm-candidate-avatar {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+          color: white;
+          font-size: 1.4rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          border: 3px solid #e2e8f0;
+        }
+
+        .voted-avatar {
           width: 100%;
           height: 100%;
-          object-fit: cover;
           border-radius: 50%;
-          border: 5px solid #1e3a8a;
+          background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+          color: white;
+          font-size: 2rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .candidate-vote-symbol {

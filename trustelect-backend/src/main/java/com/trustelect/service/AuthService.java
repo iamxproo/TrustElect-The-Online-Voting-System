@@ -97,6 +97,7 @@ public class AuthService {
 
     // ─── Voter Self-Registration ────────────────────────────────────
     @Transactional
+    @SuppressWarnings("null")
     public RegisterResponse registerVoter(VoterRegisterRequest request) {
         if (voterRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email already registered!");

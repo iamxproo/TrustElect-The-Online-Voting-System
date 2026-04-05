@@ -43,6 +43,7 @@ public class CandidateService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public CandidateResponse addCandidate(CandidateRequest request) {
         Candidate candidate = Candidate.builder()
                 .name(request.getName())
@@ -54,6 +55,7 @@ public class CandidateService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public CandidateResponse updateCandidate(Long id, CandidateRequest request) {
         Candidate candidate = findById(id);
         candidate.setName(request.getName());
@@ -64,6 +66,7 @@ public class CandidateService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public void deleteCandidate(Long id) {
         Candidate candidate = findById(id);
         candidate.setActive(false);
@@ -71,6 +74,7 @@ public class CandidateService {
     }
 
     // ─── Helpers ──────────────────────────────────────────────────
+    @SuppressWarnings("null")
     private Candidate findById(Long id) {
         return candidateRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate not found with id: " + id));

@@ -20,14 +20,14 @@ export default function ManageVoters() {
 
   useEffect(() => {
     if (!user || user.type !== 'admin') {
-      navigate('/login');
+      navigate('/');
       return;
     }
     loadVoters();
   }, [user]);
 
-  const loadVoters = () => {
-    const data = getVoters();
+  const loadVoters = async () => {
+    const data = await getVoters();
     setVoters(data);
   };
 
@@ -38,13 +38,13 @@ export default function ManageVoters() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (editingVoter) {
-      updateVoter(editingVoter.id, formData);
+      await updateVoter(editingVoter.id, formData);
     } else {
-      const result = addVoter(formData);
+      const result = await addVoter(formData);
       if (result.success) {
         alert(`Voter added! Voter ID: ${result.voterId}, Password: ${result.password}`);
       }
@@ -66,9 +66,9 @@ export default function ManageVoters() {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to remove this voter?')) {
-      removeVoter(id);
+      await removeVoter(id);
       loadVoters();
     }
   };

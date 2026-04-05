@@ -17,14 +17,14 @@ export default function AddCandidates() {
 
   useEffect(() => {
     if (!user || user.type !== 'admin') {
-      navigate('/login');
+      navigate('/');
       return;
     }
     loadCandidates();
   }, [user]);
 
-  const loadCandidates = () => {
-    const data = getCandidates();
+  const loadCandidates = async () => {
+    const data = await getCandidates();
     setCandidates(data);
   };
 
@@ -49,13 +49,13 @@ export default function AddCandidates() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (editingCandidate) {
-      updateCandidate(editingCandidate.id, formData);
+      await updateCandidate(editingCandidate.id, formData);
     } else {
-      addCandidate(formData);
+      await addCandidate(formData);
     }
     
     loadCandidates();
@@ -73,9 +73,9 @@ export default function AddCandidates() {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to remove this candidate?')) {
-      removeCandidate(id);
+      await removeCandidate(id);
       loadCandidates();
     }
   };
@@ -288,15 +288,6 @@ export default function AddCandidates() {
                       accept="image/*"
                       onChange={handleImageUpload}
                       style={{ display: 'none' }}
-                    />
-                    <span className="or-text">OR</span>
-                    <input
-                      type="url"
-                      name="image"
-                      className="form-input"
-                      placeholder="Enter image URL"
-                      value={formData.image}
-                      onChange={handleChange}
                     />
                   </div>
                 </div>
@@ -690,12 +681,6 @@ export default function AddCandidates() {
           align-items: center;
           justify-content: center;
           gap: 0.5rem;
-        }
-
-        .or-text {
-          color: #94a3b8;
-          font-size: 0.85rem;
-          font-weight: 500;
         }
 
         .upload-buttons .form-input {

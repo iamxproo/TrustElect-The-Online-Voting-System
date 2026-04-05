@@ -19,6 +19,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @SuppressWarnings("null")
     public void run(String... args) {
         if (adminRepository.count() == 0) {
             Admin admin = Admin.builder()

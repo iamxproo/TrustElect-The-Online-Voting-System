@@ -32,6 +32,7 @@ public class VoteService {
     private final VoterService voterService;
 
     @Transactional
+    @SuppressWarnings("null")
     public void castVote(Long voterId, CastVoteRequest request) {
         Voter voter = voterRepository.findById(voterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Voter not found"));
@@ -70,6 +71,7 @@ public class VoteService {
         voterRepository.save(voter);
     }
 
+    @SuppressWarnings("null")
     public List<VoteHistoryResponse> getVoteHistory() {
         List<Vote> votes = voteRepository.findAllOrderByTimestampDesc();
         return votes.stream().map(v -> {

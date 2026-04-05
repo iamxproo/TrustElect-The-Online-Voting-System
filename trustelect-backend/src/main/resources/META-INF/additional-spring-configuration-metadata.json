@@ -1,0 +1,29 @@
+{
+  "properties": [
+    {
+      "name": "app.jwt.secret",
+      "type": "java.lang.String",
+      "description": "Secret key used for signing JWT tokens."
+    },
+    {
+      "name": "app.jwt.expiration",
+      "type": "java.lang.Long",
+      "description": "JWT token expiration time in milliseconds (default: 86400000 = 24 hours)."
+    },
+    {
+      "name": "app.otp.expiry",
+      "type": "java.lang.Integer",
+      "description": "OTP expiry duration in minutes (default: 10)."
+    },
+    {
+      "name": "app.cors.allowed-origins",
+      "type": "java.lang.String",
+      "description": "Comma-separated list of allowed CORS origins (e.g. http://localhost:5173)."
+    },
+    {
+      "name": "app.upload.dir",
+      "type": "java.lang.String",
+      "description": "Directory path for storing uploaded candidate images."
+    }
+  ]
+}

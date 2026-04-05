@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 export default function VoterDashboard() {
@@ -14,22 +14,22 @@ export default function VoterDashboard() {
 
   useEffect(() => {
     if (!user || user.type !== 'voter') {
-      navigate('/login');
+      navigate('/');
       return;
     }
 
     loadData();
   }, [user]);
 
-  const loadData = () => {
-    const candidateData = getCandidates();
+  const loadData = async () => {
+    const candidateData = await getCandidates();
     setCandidates(candidateData);
     
-    const electionData = getElection();
+    const electionData = await getElection();
     setElection(electionData);
 
-    const total = getTotalVoters();
-    const voted = getVotedCount();
+    const total = await getTotalVoters();
+    const voted = await getVotedCount();
     setStats({
       total,
       voted,
@@ -39,7 +39,7 @@ export default function VoterDashboard() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const handleVote = () => {
@@ -160,58 +160,6 @@ export default function VoterDashboard() {
                     <span>You have voted for <strong>{votedFor()}</strong></span>
                   </div>
                 )}
-                <Link to="/results" className="btn btn-secondary btn-lg">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24">
-                    <line x1="18" y1="20" x2="18" y2="10"/>
-                    <line x1="12" y1="20" x2="12" y2="4"/>
-                    <line x1="6" y1="20" x2="6" y2="14"/>
-                  </svg>
-                  View Live Results
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="stats-section">
-            <div className="stat-card-voter">
-              <div className="stat-icon-voter">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                  <circle cx="9" cy="7" r="4"/>
-                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                </svg>
-              </div>
-              <div className="stat-text">
-                <span className="stat-number">{stats.total}</span>
-                <span className="stat-label">Total Voters</span>
-              </div>
-            </div>
-
-            <div className="stat-card-voter">
-              <div className="stat-icon-voter stat-icon-success">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                  <polyline points="22 4 12 14.01 9 11.01"/>
-                </svg>
-              </div>
-              <div className="stat-text">
-                <span className="stat-number">{stats.voted}</span>
-                <span className="stat-label">Votes Cast</span>
-              </div>
-            </div>
-
-            <div className="stat-card-voter">
-              <div className="stat-icon-voter stat-icon-warning">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <polyline points="12 6 12 12 16 14"/>
-                </svg>
-              </div>
-              <div className="stat-text">
-                <span className="stat-number">{stats.remaining}</span>
-                <span className="stat-label">Remaining</span>
               </div>
             </div>
           </div>
@@ -225,17 +173,10 @@ export default function VoterDashboard() {
               {candidates.map((candidate, index) => (
                 <div key={candidate.id} className="candidate-card-voter">
                   <div className="candidate-image-wrapper">
-                    <img 
-                      src={candidate.image} 
-                      alt={candidate.name}
-                      onError={(e) => {
-                        e.target.src = 'https://via.placeholder.com/300x300?text=Candidate';
-                      }}
-                    />
+                    <div className="candidate-avatar-dash">
+                      {candidate.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                    </div>
                     <div className="candidate-number">{index + 1}</div>
-                    {candidate.symbol && (
-                      <span className="candidate-symbol-voter">{candidate.symbol}</span>
-                    )}
                   </div>
                   <div className="candidate-body">
                     <h4>{candidate.name}</h4>
@@ -599,19 +540,32 @@ export default function VoterDashboard() {
 
         .candidate-image-wrapper {
           position: relative;
-          height: 280px;
+          height: 160px;
           overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #e0e7ff, #dbeafe);
         }
 
-        .candidate-image-wrapper img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
+        .candidate-avatar-dash {
+          width: 100px;
+          height: 100px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+          color: white;
+          font-size: 2.2rem;
+          font-weight: 800;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          letter-spacing: 0.05em;
+          box-shadow: 0 6px 20px rgba(30,58,138,0.3);
+        }
+
+        .candidate-card-voter:hover .candidate-avatar-dash {
+          transform: scale(1.08);
           transition: transform 0.3s ease;
-        }
-
-        .candidate-card-voter:hover .candidate-image-wrapper img {
-          transform: scale(1.1);
         }
 
         .candidate-number {

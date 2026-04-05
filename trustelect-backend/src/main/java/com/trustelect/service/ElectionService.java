@@ -38,6 +38,7 @@ public class ElectionService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public ElectionResponse createElection(ElectionRequest request) {
         Election election = Election.builder()
                 .title(request.getTitle())
@@ -50,6 +51,7 @@ public class ElectionService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public ElectionResponse updateElection(Long id, ElectionRequest request) {
         Election election = findById(id);
         election.setTitle(request.getTitle());
@@ -61,11 +63,13 @@ public class ElectionService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public void deleteElection(Long id) {
         electionRepository.delete(findById(id));
     }
 
     // ─── Helpers ──────────────────────────────────────────────────
+    @SuppressWarnings("null")
     private Election findById(Long id) {
         return electionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Election not found with id: " + id));

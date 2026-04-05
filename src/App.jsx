@@ -2,6 +2,7 @@ import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-d
 import AddCandidates from './components/admin/AddCandidates';
 import AdminDashboard from './components/admin/AdminDashboard';
 import ManageVoters from './components/admin/ManageVoters';
+import AdminLogin from './components/auth/AdminLogin';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
 import VoterDashboard from './components/voter/Dashboard';
@@ -24,7 +25,7 @@ function AdminRoute({ children }) {
   }
   
   if (!user || user.type !== 'admin') {
-    return <Navigate to="/login" />;
+    return <Navigate to="/admin/login" />;
   }
   
   return children;
@@ -77,6 +78,7 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/admin/login" element={<AdminLogin />} />
       <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
       <Route path="/admin/voters" element={<AdminRoute><ManageVoters /></AdminRoute>} />
       <Route path="/admin/candidates" element={<AdminRoute><AddCandidates /></AdminRoute>} />

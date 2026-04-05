@@ -61,6 +61,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.DELETE, "/api/candidates/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/election/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/election/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/votes/stats").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/votes/history").hasRole("ADMIN")
                 // Voter
                 .requestMatchers("/api/voter/**").hasAnyRole("VOTER", "ADMIN")

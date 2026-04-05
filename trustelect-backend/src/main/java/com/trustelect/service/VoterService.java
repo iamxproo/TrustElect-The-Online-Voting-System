@@ -37,6 +37,7 @@ public class VoterService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public RegisterResponse addVoter(VoterRegisterRequest request) {
         if (voterRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email already registered!");
@@ -68,6 +69,7 @@ public class VoterService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public VoterResponse updateVoter(Long id, VoterRegisterRequest request) {
         Voter voter = findById(id);
 
@@ -86,6 +88,7 @@ public class VoterService {
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public void removeVoter(Long id) {
         Voter voter = findById(id);
         voter.setActive(false);
@@ -102,6 +105,7 @@ public class VoterService {
     public long getVotedCount()   { return voterRepository.countByHasVotedTrue(); }
 
     // ─── Helpers ──────────────────────────────────────────────────
+    @SuppressWarnings("null")
     private Voter findById(Long id) {
         return voterRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Voter not found with id: " + id));

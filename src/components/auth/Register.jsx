@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
@@ -7,7 +8,7 @@ export default function Register() {
     name: '',
     email: '',
     phone: '',
-    class: '',
+    className: '',
     rollNumber: ''
   });
   const [error, setError] = useState('');
@@ -30,7 +31,7 @@ export default function Register() {
     setLoading(true);
     setError('');
 
-    if (!formData.name || !formData.email || !formData.class || !formData.rollNumber) {
+    if (!formData.name || !formData.email || !formData.className || !formData.rollNumber) {
       setError('Please fill in all required fields');
       setLoading(false);
       return;
@@ -48,19 +49,158 @@ export default function Register() {
   };
 
   const handleLogin = () => {
-    navigate('/login');
+    navigate('/login', {
+      state: {
+        prefillVoterId: success?.voterId,
+        prefillPassword: success?.password,
+      },
+    });
   };
 
   return (
+    <>
+    {/* ── SUCCESS POPUP MODAL via Portal ── */}
+    {success && createPortal(
+      <div className="reg-success-overlay" onClick={handleLogin}>
+        <div className="reg-success-popup" onClick={e => e.stopPropagation()}>
+          <div className="reg-popup-check">✅</div>
+          <h2 className="reg-popup-title">Registration Successful!</h2>
+          <p className="reg-popup-sub">Save your credentials — you'll need these to login.</p>
+
+          <div className="reg-popup-creds">
+            <div className="reg-popup-row">
+              <span className="reg-popup-label">🪪 Voter ID</span>
+              <span className="reg-popup-val">{success.voterId}</span>
+            </div>
+            <div className="reg-popup-divider" />
+            <div className="reg-popup-row">
+              <span className="reg-popup-label">🔑 Password</span>
+              <span className="reg-popup-val">{success.password}</span>
+            </div>
+          </div>
+
+          <p className="reg-popup-note">💡 Voter ID aur Password dono <strong>same</strong> hain.</p>
+
+          <button onClick={handleLogin} className="reg-popup-btn">
+            OK — Login karo
+          </button>
+        </div>
+
+        <style>{`
+          .reg-success-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(6px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            animation: fadeIn 0.2s ease;
+          }
+          @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
+
+          .reg-success-popup {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem 2rem;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+            text-align: center;
+            animation: slideUp 0.25s ease;
+          }
+          @keyframes slideUp { from { transform:translateY(30px); opacity:0 } to { transform:translateY(0); opacity:1 } }
+
+          .reg-popup-check { font-size: 3.5rem; line-height: 1; margin-bottom: 0.6rem; }
+
+          .reg-popup-title {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #064e3b;
+            margin-bottom: 0.3rem;
+          }
+
+          .reg-popup-sub {
+            font-size: 0.88rem;
+            color: #64748b;
+            margin-bottom: 1.4rem;
+          }
+
+          .reg-popup-creds {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 2px solid #10b981;
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1rem;
+            text-align: left;
+          }
+
+          .reg-popup-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+          }
+
+          .reg-popup-label {
+            font-size: 0.85rem;
+            color: #065f46;
+            font-weight: 600;
+            white-space: nowrap;
+          }
+
+          .reg-popup-val {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            letter-spacing: 0.04em;
+            background: white;
+            padding: 0.3rem 0.75rem;
+            border-radius: 8px;
+            border: 1.5px solid #bfdbfe;
+            font-family: monospace;
+          }
+
+          .reg-popup-divider {
+            height: 1px;
+            background: #a7f3d0;
+            margin: 0.85rem 0;
+          }
+
+          .reg-popup-note {
+            font-size: 0.82rem;
+            color: #64748b;
+            margin-bottom: 1.4rem;
+          }
+
+          .reg-popup-btn {
+            width: 100%;
+            padding: 0.9rem;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.4);
+            transition: transform 0.15s, box-shadow 0.15s;
+          }
+          .reg-popup-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16,185,129,0.5);
+          }
+        `}</style>
+      </div>,
+      document.body
+    )}
+
     <div className="min-h-screen flex items-center justify-center p-4">
-      {/* Background Effects */}
-      <div className="background-effects">
-        <div className="orb orb-1"></div>
-        <div className="orb orb-2"></div>
-        <div className="orb orb-3"></div>
-      </div>
 
       <div className="register-container animate-fadeIn">
+        <>
         {/* Header with Logo */}
         <div className="register-header">
           <div className="logo-container">
@@ -72,43 +212,6 @@ export default function Register() {
           <p className="register-subtitle">DY Patil School Of Engineering And Technology, Ambi</p>
           <p className="register-election">Headboy Election 2024-25</p>
         </div>
-
-        {/* Success Message */}
-        {success && (
-          <div className="success-card">
-            <div className="success-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                <polyline points="22 4 12 14.01 9 11.01"/>
-              </svg>
-            </div>
-            <h3>Registration Successful!</h3>
-            <p>Your voter credentials have been generated. Please save them safely.</p>
-            
-            <div className="credentials-box">
-              <div className="credential-item">
-                <span className="credential-label">Voter ID</span>
-                <span className="credential-value">{success.voterId}</span>
-              </div>
-              <div className="credential-item">
-                <span className="credential-label">Password</span>
-                <span className="credential-value">{success.password}</span>
-              </div>
-            </div>
-            
-            <p className="email-note">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                <polyline points="22,6 12,13 2,6"/>
-              </svg>
-              Credentials sent to: {formData.email}
-            </p>
-
-            <button onClick={handleLogin} className="btn btn-primary btn-lg w-full">
-              Proceed to Login
-            </button>
-          </div>
-        )}
 
         {/* Error Message */}
         {error && !success && (
@@ -189,9 +292,9 @@ export default function Register() {
                     <path d="M6 12v5c3 3 9 3 12 0v-5"/>
                   </svg>
                   <select
-                    name="class"
+                    name="className"
                     className="form-input with-icon"
-                    value={formData.class}
+                    value={formData.className}
                     onChange={handleChange}
                     required
                   >
@@ -264,9 +367,118 @@ export default function Register() {
           <p>© 2024 TrustElect Voting System</p>
           <p>Secure • Transparent • Democratic</p>
         </div>
+        </>
       </div>
 
       <style>{`
+        .success-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.55);
+          backdrop-filter: blur(4px);
+          z-index: 1000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+        }
+
+        .success-popup {
+          background: white;
+          border-radius: 24px;
+          padding: 2.5rem 2rem;
+          width: 100%;
+          max-width: 420px;
+          box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+          text-align: center;
+          position: relative;
+        }
+
+        .popup-check {
+          font-size: 3.5rem;
+          margin-bottom: 0.75rem;
+          line-height: 1;
+        }
+
+        .success-popup h2 {
+          font-size: 1.5rem;
+          font-weight: 800;
+          color: #064e3b;
+          margin-bottom: 0.4rem;
+        }
+
+        .popup-sub {
+          font-size: 0.9rem;
+          color: #64748b;
+          margin-bottom: 1.5rem;
+        }
+
+        .popup-creds {
+          background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+          border: 2px solid #10b981;
+          border-radius: 16px;
+          padding: 1.25rem 1.5rem;
+          margin-bottom: 1rem;
+          text-align: left;
+        }
+
+        .popup-cred-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+
+        .popup-cred-label {
+          font-size: 0.85rem;
+          color: #065f46;
+          font-weight: 600;
+          white-space: nowrap;
+        }
+
+        .popup-cred-val {
+          font-size: 1.1rem;
+          font-weight: 800;
+          color: #1e3a8a;
+          letter-spacing: 0.04em;
+          background: white;
+          padding: 0.3rem 0.75rem;
+          border-radius: 8px;
+          border: 1.5px solid #bfdbfe;
+          font-family: monospace;
+        }
+
+        .popup-cred-divider {
+          height: 1px;
+          background: #a7f3d0;
+          margin: 0.85rem 0;
+        }
+
+        .popup-note {
+          font-size: 0.82rem;
+          color: #64748b;
+          margin-bottom: 1.5rem;
+        }
+
+        .popup-btn {
+          width: 100%;
+          padding: 0.9rem;
+          background: linear-gradient(135deg, #10b981, #059669);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 1rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: transform 0.15s, box-shadow 0.15s;
+          box-shadow: 0 4px 15px rgba(16,185,129,0.4);
+        }
+
+        .popup-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(16,185,129,0.5);
+        }
+
         .background-effects {
           position: fixed;
           top: 0;
@@ -540,5 +752,6 @@ export default function Register() {
         }
       `}</style>
     </div>
+    </>
   );
 }
