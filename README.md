@@ -2,11 +2,11 @@
 
 <p align="center">
   <a href="https://trust-elect-the-online-voting-syste.vercel.app" target="_blank">
-    <img src="https://img.shields.io/badge/🌐%20Live%20Demo-Visit%20Now-brightgreen?style=for-the-badge&logo=vercel"/>
+    <img src="https://img.shields.io/badge/Live%20Demo-Visit%20Now-brightgreen?style=for-the-badge&logo=vercel&logoColor=white"/>
   </a>
-  &nbsp;
+  &nbsp;&nbsp;
   <a href="https://trustelect-the-online-voting-system.onrender.com/api/health" target="_blank">
-    <img src="https://img.shields.io/badge/⚙️%20Backend%20API-Online-blue?style=for-the-badge&logo=render"/>
+    <img src="https://img.shields.io/badge/Backend%20API-Online-blue?style=for-the-badge&logo=render&logoColor=white"/>
   </a>
 </p>
 
@@ -26,12 +26,6 @@
   <img src="https://img.shields.io/badge/MySQL-8-blue?style=flat-square&logo=mysql"/>
   <img src="https://img.shields.io/badge/JWT-Auth-yellow?style=flat-square"/>
   <img src="https://img.shields.io/badge/Deployed-Render%20%2B%20Vercel-success?style=flat-square"/>
-</p>
-
-<p align="center">
-  <a href="https://trust-elect-the-online-voting-syste.vercel.app" target="_blank">
-    <img src="https://img.shields.io/badge/🌐 Live Demo-Visit Now-blue?style=for-the-badge"/>
-  </a>
 </p>
 
 ---
