@@ -14,6 +14,8 @@ public interface VoterRepository extends JpaRepository<Voter, Long> {
     Optional<Voter> findByVoterIdAndPassword(String voterId, String password);
     boolean existsByEmail(String email);
     boolean existsByVoterId(String voterId);
+    boolean existsByRollNumber(String rollNumber);
+    boolean existsByPhone(String phone);
     long countByHasVotedTrue();
     long countByActiveTrue();
 

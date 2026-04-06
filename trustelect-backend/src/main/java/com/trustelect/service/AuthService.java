@@ -100,7 +100,15 @@ public class AuthService {
     @SuppressWarnings("null")
     public RegisterResponse registerVoter(VoterRegisterRequest request) {
         if (voterRepository.existsByEmail(request.getEmail())) {
-            throw new BadRequestException("Email already registered!");
+            throw new BadRequestException("This email is already registered!");
+        }
+        if (request.getRollNumber() != null && !request.getRollNumber().isBlank()
+                && voterRepository.existsByRollNumber(request.getRollNumber())) {
+            throw new BadRequestException("This roll number is already registered! Each student can register only once.");
+        }
+        if (request.getPhone() != null && !request.getPhone().isBlank()
+                && voterRepository.existsByPhone(request.getPhone())) {
+            throw new BadRequestException("This phone number is already registered!");
         }
 
         // Build voterId from name (firstName + lastName)

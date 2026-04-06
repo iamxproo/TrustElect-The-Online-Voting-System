@@ -36,7 +36,7 @@ public class Voter {
     @Column(name = "class_name")
     private String className;
 
-    @Column(name = "roll_number")
+    @Column(name = "roll_number", unique = true)
     private String rollNumber;
 
     @Column(name = "voter_id", nullable = false, unique = true)

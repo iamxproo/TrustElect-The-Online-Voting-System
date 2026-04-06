@@ -40,7 +40,15 @@ public class VoterService {
     @SuppressWarnings("null")
     public RegisterResponse addVoter(VoterRegisterRequest request) {
         if (voterRepository.existsByEmail(request.getEmail())) {
-            throw new BadRequestException("Email already registered!");
+            throw new BadRequestException("This email is already registered!");
+        }
+        if (request.getRollNumber() != null && !request.getRollNumber().isBlank()
+                && voterRepository.existsByRollNumber(request.getRollNumber())) {
+            throw new BadRequestException("This roll number is already registered!");
+        }
+        if (request.getPhone() != null && !request.getPhone().isBlank()
+                && voterRepository.existsByPhone(request.getPhone())) {
+            throw new BadRequestException("This phone number is already registered!");
         }
 
         String voterId = "VTR" + System.currentTimeMillis() % 1_000_000;
@@ -76,6 +84,11 @@ public class VoterService {
         if (!voter.getEmail().equals(request.getEmail())
                 && voterRepository.existsByEmail(request.getEmail())) {
             throw new BadRequestException("Email already in use by another voter");
+        }
+        if (request.getRollNumber() != null && !request.getRollNumber().isBlank()
+                && !request.getRollNumber().equals(voter.getRollNumber())
+                && voterRepository.existsByRollNumber(request.getRollNumber())) {
+            throw new BadRequestException("Roll number already in use by another voter");
         }
 
         voter.setName(request.getName());
