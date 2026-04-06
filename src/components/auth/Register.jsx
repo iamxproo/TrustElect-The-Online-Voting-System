@@ -14,9 +14,20 @@ export default function Register() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [serverWaking, setServerWaking] = useState(false);
   
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  // Pre-warm the backend as soon as page loads
+  useEffect(() => {
+    const warmUp = async () => {
+      try {
+        await fetch(`${import.meta.env.VITE_API_URL}/health`, { method: 'GET' });
+      } catch (_) { /* silent */ }
+    };
+    warmUp();
+  }, []);
 
   // Auto-navigate to login after popup shown
   useEffect(() => {
@@ -41,6 +52,7 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setServerWaking(false);
     setError('');
 
     if (!formData.name || !formData.email || !formData.className || !formData.rollNumber) {
@@ -49,7 +61,12 @@ export default function Register() {
       return;
     }
 
+    // If response takes >4s, show a friendly wake-up message
+    const wakeTimer = setTimeout(() => setServerWaking(true), 4000);
+
     const result = await register(formData);
+    clearTimeout(wakeTimer);
+    setServerWaking(false);
 
     if (result.success) {
       setSuccess(result);
@@ -250,11 +267,18 @@ export default function Register() {
               </div>
 
               <button type="submit" className="rv-btn" disabled={loading}>
-                {loading
-                  ? <><span className="rv-spinner" /> Registering...</>
-                  : <>Register as Voter &nbsp;→</>
-                }
+                {loading ? (
+                  <>
+                    <span className="rv-spinner" />
+                    {serverWaking ? 'Server wake ho raha hai... (~30s)' : 'Registering...'}
+                  </>
+                ) : (
+                  <>Register as Voter &nbsp;→</>
+                )}
               </button>
+              {serverWaking && (
+                <p className="rv-wake-note">⏳ Free server thoda slow hai pehli baar — bas 30 seconds...</p>
+              )}
             </form>
 
             <p className="rv-login-link">
@@ -311,6 +335,8 @@ export default function Register() {
         .rv-login-link { text-align:center; margin-top:1.25rem; font-size:0.9rem; color:#64748b; }
         .rv-login-link a { color:#10b981; font-weight:700; text-decoration:none; }
         .rv-login-link a:hover { text-decoration:underline; }
+        .rv-wake-note { text-align:center; font-size:0.8rem; color:#d97706; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.5rem 0.75rem; margin-top:0.5rem; animation:rv-fadein 0.4s ease; }
+        @keyframes rv-fadein { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
 
         @media (max-width:768px) {
           .rv-page { flex-direction:column; }

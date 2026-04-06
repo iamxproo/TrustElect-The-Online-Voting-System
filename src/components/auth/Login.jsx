@@ -8,6 +8,8 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
 
+  const [serverWaking, setServerWaking] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,6 +19,8 @@ export default function Login() {
     if (prefillVoterId) {
       setFormData(prev => ({ ...prev, voterId: prefillVoterId, password: prefillPassword || '' }));
     }
+    // Pre-warm the backend silently
+    fetch(`${import.meta.env.VITE_API_URL}/health`, { method: 'GET' }).catch(() => {});
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = (e) => {
@@ -27,8 +31,12 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setServerWaking(false);
     setError('');
+    const wakeTimer = setTimeout(() => setServerWaking(true), 4000);
     const result = await login('voter', { voterIdOrEmail: formData.voterId, password: formData.password });
+    clearTimeout(wakeTimer);
+    setServerWaking(false);
     if (result.success) {
       navigate('/voter');
     } else {
@@ -143,11 +151,14 @@ export default function Login() {
 
             <button type="submit" className="lv-btn" disabled={loading}>
               {loading ? (
-                <><span className="lv-spinner" /> Logging in...</>
+                <><span className="lv-spinner" /> {serverWaking ? 'Server wake ho raha hai...' : 'Logging in...'}</>
               ) : (
                 <>Login to Vote &nbsp;→</>
               )}
             </button>
+            {serverWaking && (
+              <p className="lv-wake-note">⏳ Free server thoda slow hai pehli baar — bas 30 seconds...</p>
+            )}
           </form>
 
           <p className="lv-register-link">
@@ -432,6 +443,8 @@ export default function Login() {
           text-decoration: none;
         }
         .lv-register-link a:hover { text-decoration: underline; }
+        .lv-wake-note { text-align:center; font-size:0.8rem; color:#d97706; background:#fffbeb; border:1px solid #fde68a; border-radius:8px; padding:0.5rem 0.75rem; margin-top:0.5rem; animation:lv-fadein 0.4s ease; }
+        @keyframes lv-fadein { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
 
         .lv-divider {
           display: flex;
