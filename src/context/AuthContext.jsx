@@ -17,7 +17,6 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (userType, credentials) => {
-    setLoading(true);
     try {
       let authData;
       if (userType === 'admin') {
@@ -27,7 +26,6 @@ export function AuthProvider({ children }) {
       }
 
       if (authData.hasVoted && userType === 'voter') {
-        setLoading(false);
         return { success: false, message: 'You have already voted!' };
       }
 
@@ -44,19 +42,15 @@ export function AuthProvider({ children }) {
       localStorage.setItem('trustelect_token', authData.token);
       localStorage.setItem('trustelect_session', JSON.stringify(userData));
       setUser(userData);
-      setLoading(false);
       return { success: true };
     } catch (err) {
-      setLoading(false);
       return { success: false, message: err.message || 'Invalid credentials!' };
     }
   };
 
   const register = async (voterData) => {
-    setLoading(true);
     try {
       const result = await api.registerVoter(voterData);
-      setLoading(false);
       return {
         success: true,
         voterId: result.voterId,
@@ -64,7 +58,6 @@ export function AuthProvider({ children }) {
         message: result.message || 'Registration successful!',
       };
     } catch (err) {
-      setLoading(false);
       return { success: false, message: err.message || 'Registration failed!' };
     }
   };
