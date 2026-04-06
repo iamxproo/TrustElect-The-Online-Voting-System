@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
@@ -17,6 +17,21 @@ export default function Register() {
   
   const { register } = useAuth();
   const navigate = useNavigate();
+
+  // Auto-navigate to login after popup shown
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        navigate('/login', {
+          state: {
+            prefillVoterId: success?.voterId,
+            prefillPassword: success?.password,
+          },
+        });
+      }, 8000); // 8 seconds to read credentials
+      return () => clearTimeout(timer);
+    }
+  }, [success]);
 
   const handleChange = (e) => {
     setFormData({
@@ -82,8 +97,11 @@ export default function Register() {
           <p className="reg-popup-note">💡 Voter ID aur Password dono <strong>same</strong> hain.</p>
 
           <button onClick={handleLogin} className="reg-popup-btn">
-            OK — Login karo
+            Login Page pe Jao →
           </button>
+          <p style={{fontSize:'0.75rem', color:'#6b7280', marginTop:'0.5rem', textAlign:'center'}}>
+            8 seconds mein automatically redirect hoga...
+          </p>
         </div>
 
         <style>{`

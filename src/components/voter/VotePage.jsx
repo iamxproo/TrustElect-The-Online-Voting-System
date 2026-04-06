@@ -70,6 +70,7 @@ export default function VotePage() {
   const { user, getCandidates, castVote, logout } = useAuth();
   const navigate = useNavigate();
   const [candidates, setCandidates] = useState([]);
+  const [electionActive, setElectionActive] = useState(true);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -87,8 +88,16 @@ export default function VotePage() {
     }
 
     const loadCandidates = async () => {
-      const data = await getCandidates();
-      setCandidates(data);
+      try {
+        const data = await getCandidates();
+        setCandidates(data || []);
+        if (!data || data.length === 0) {
+          setElectionActive(false);
+        }
+      } catch (e) {
+        setCandidates([]);
+        setElectionActive(false);
+      }
       // If user already voted, show success screen
       if (user.hasVoted) {
         setSuccess(true);
@@ -661,6 +670,57 @@ export default function VotePage() {
             <h2>Headboy Election 2024-25</h2>
             <p>Select your preferred candidate carefully. Your vote matters!</p>
           </div>
+
+          {!electionActive && (
+            <div style={{
+              textAlign: 'center',
+              padding: '3rem 2rem',
+              background: 'white',
+              borderRadius: '16px',
+              boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+              marginBottom: '2rem'
+            }}>
+              <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🗳️</div>
+              <h3 style={{ fontSize: '1.5rem', fontWeight: '700', color: '#1f2937', marginBottom: '0.5rem' }}>
+                Abhi Koi Election Active Nahi Hai
+              </h3>
+              <p style={{ color: '#6b7280', marginBottom: '2rem', fontSize: '0.95rem' }}>
+                Election shuru hone ke baad aap apna vote de sakte hain. Baad mein aakar vote karein.
+              </p>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => navigate('/voter')}
+                  style={{
+                    padding: '0.75rem 2rem',
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontWeight: '600',
+                    fontSize: '1rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🏠 Dashboard pe Jao
+                </button>
+                <button
+                  onClick={() => { logout(); navigate('/'); }}
+                  style={{
+                    padding: '0.75rem 2rem',
+                    background: 'white',
+                    color: '#374151',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '10px',
+                    fontWeight: '600',
+                    fontSize: '1rem',
+                    cursor: 'pointer'
+                  }}
+                >
+                  ⏰ Vote Later — Logout
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="candidates-vote-grid">
             {candidates.map((candidate, index) => (
