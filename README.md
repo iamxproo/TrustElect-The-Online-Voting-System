@@ -1,6 +1,16 @@
 # 🗳️ TrustElect — The Online Voting System
 
 <p align="center">
+  <a href="https://trust-elect-the-online-voting-syste.vercel.app" target="_blank">
+    <img src="https://img.shields.io/badge/🌐%20Live%20Demo-Visit%20Now-brightgreen?style=for-the-badge&logo=vercel"/>
+  </a>
+  &nbsp;
+  <a href="https://trustelect-the-online-voting-system.onrender.com/api/health" target="_blank">
+    <img src="https://img.shields.io/badge/⚙️%20Backend%20API-Online-blue?style=for-the-badge&logo=render"/>
+  </a>
+</p>
+
+<p align="center">
   <img src="public/logo.png" alt="TrustElect Logo" width="120"/>
 </p>
 
@@ -9,11 +19,19 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Java-25-orange?style=flat-square&logo=openjdk"/>
+  <img src="https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk"/>
   <img src="https://img.shields.io/badge/Spring_Boot-3.5.13-brightgreen?style=flat-square&logo=springboot"/>
   <img src="https://img.shields.io/badge/React-18-blue?style=flat-square&logo=react"/>
+  <img src="https://img.shields.io/badge/Vite-5-purple?style=flat-square&logo=vite"/>
   <img src="https://img.shields.io/badge/MySQL-8-blue?style=flat-square&logo=mysql"/>
   <img src="https://img.shields.io/badge/JWT-Auth-yellow?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Deployed-Render%20%2B%20Vercel-success?style=flat-square"/>
+</p>
+
+<p align="center">
+  <a href="https://trust-elect-the-online-voting-syste.vercel.app" target="_blank">
+    <img src="https://img.shields.io/badge/🌐 Live Demo-Visit Now-blue?style=for-the-badge"/>
+  </a>
 </p>
 
 ---
